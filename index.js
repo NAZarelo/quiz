@@ -1,46 +1,17 @@
-let buttonPlus = document.querySelector('.plus')
-let buttonEnd = document.querySelector('.end')
-let exercise = document.querySelector('.exercise')
-let inp_corect = document.querySelector('.inp-corect')
-let inp_one = document.querySelector('.inp-1')
-let inp_two = document.querySelector('.inp-2')
-let inp_three = document.querySelector('.inp-3')
-let inp_four = document.querySelector('.inp-4')
-let question = document.querySelector('.question')
-let test = document.querySelector('.test')
+// Отримуємо кнопки та контейнери з HTML
+let buttonPlus = document.querySelector('.plus')      // кнопка "додати питання"
+let buttonEnd = document.querySelector('.end')        // кнопка "завершити тест"
+let exercise = document.querySelector('.exercise')    // блок, де будуть інпути з питаннями
+let test = document.querySelector('.test')            // блок, де буде готовий тест
 
+// Масив для збереження усіх питань з відповідями
 let questionAnswers = []
 
-function end() {
-    exercise.style.display = 'none'
-    buttonPlus.style.display = 'none'
-    buttonEnd.style.display = 'none'
-    for(let i = 0; i < questionAnswers.length; i += 1) {
-        let endValue =  questionAnswers[i]
-        qa = (endValue.split('.'))
-        q = qa[0]
-        a = qa[1]
-        aAll = (a.split(','))
-        a_corect = aAll[0]
-        a_one = aAll[1]
-        a_two = aAll[2]
-        a_three = aAll[3]
-        a_four = aAll[4]
-        test.innerHTML += `<div class="Tex">
-            <h1 class="Tquestion">${q}</h1>
-            <div class="Tanswers">
-                <h2 class="Tans Tcorect">варіант відповіді<br><button class="Tinp-corect">${a_corect}</button></h2>
-                <h2 class="Tans">варіант відповіді<br><button class="Tinp-1">${a_one}</button></h2>
-                <h2 class="Tans">варіант відповіді<br><button class="Tinp-2">${a_two}</button></h2>
-                <h2 class="Tans">варіант відповіді<br><button class="Tinp-3">${a_three}</button></h2>
-                <h2 class="Tans">варіант відповіді<br><button class="Tinp-4">${a_four}</button></h2>
-            </div>
-        </div>`
-    }
-}
-
+// --- Додавання нового питання ---
 buttonPlus.addEventListener('click', function() {
-    exercise.innerHTML += `<div class="ex">
+    // додаємо новий блок з полями для введення питання та відповідей
+    exercise.insertAdjacentHTML("beforeend", `
+        <div class="ex">
             <h1>ПИТАННЯ<br><input class="question" type="text"></h1>
             <div class="answers">
                 <h2 class="ans corect">варіант відповіді<br><input class="inp-corect" type="text"></h2>
@@ -49,14 +20,62 @@ buttonPlus.addEventListener('click', function() {
                 <h2 class="ans">варіант відповіді<br><input class="inp-3" type="text"></h2>
                 <h2 class="ans">варіант відповіді<br><input class="inp-4" type="text"></h2>
             </div>
-        </div>`
-    let exValue = question.value + '.' + inp_corect.value + "," + inp_one.value + "," + inp_two.value + "," + inp_three.value + "," + inp_four.value
-    questionAnswers.push (exValue)
-    exercise.innerHTML += `${questionAnswers}`
+        </div>
+    `)
 })
+// Після натискання на "плюс" зʼявляється новий блок, але нічого не зберігається у масиві.
+// Збереження робимо тільки тоді, коли натиснемо "кінець".
+
+// --- Завершення тесту ---
 buttonEnd.addEventListener('click', function() {
-    let exValue = question.value + '.' + inp_corect.value + "," + inp_one.value + "," + inp_two.value + "," + inp_three.value + "," + inp_four.value
-    questionAnswers.push (exValue)
-    exercise.innerHTML += `${questionAnswers}`
-    end()
+    questionAnswers = [] // очищаємо масив, щоб не дублювати старі дані
+    let allExercises = document.querySelectorAll('.ex') // шукаємо всі питання, які є на сторінці
+
+    // перебираємо всі блоки з питаннями
+    allExercises.forEach(ex => {
+        // зчитуємо текст питання
+        let q = ex.querySelector('.question').value
+        // зчитуємо всі відповіді
+        let a_corect = ex.querySelector('.inp-corect').value
+        let a_one = ex.querySelector('.inp-1').value
+        let a_two = ex.querySelector('.inp-2').value
+        let a_three = ex.querySelector('.inp-3').value
+        let a_four = ex.querySelector('.inp-4').value
+
+        // формуємо рядок у форматі:
+        // "Питання.Вірна,Відповідь1,Відповідь2,Відповідь3,Відповідь4"
+        let exValue = `${q}.${a_corect},${a_one},${a_two},${a_three},${a_four}`
+        // додаємо в масив
+        questionAnswers.push(exValue)
+    })
+
+    // ховаємо поля вводу і кнопки
+    exercise.style.display = 'none'
+    buttonPlus.style.display = 'none'
+    buttonEnd.style.display = 'none'
+
+    // очищаємо блок результатів перед виводом
+    test.innerHTML = ""
+
+    // виводимо усі питання з масиву як готовий тест
+    questionAnswers.forEach(endValue => {
+        // розділяємо текст на питання та відповіді
+        let qa = endValue.split('.')    // [0] - питання, [1] - відповіді
+        let q = qa[0]                   // текст питання
+        let aAll = qa[1].split(',')     // масив з усіма відповідями
+
+        // додаємо в HTML готовий блок
+        test.insertAdjacentHTML("beforeend", `
+            <div class="Tex">
+                <h1 class="Tquestion">${q}</h1>
+                <div class="Tanswers">
+                    <h2 class="Tans Tcorect">варіант відповіді<br><button class="Tinp-corect">${aAll[0]}</button></h2>
+                    <h2 class="Tans">варіант відповіді<br><button class="Tinp-1">${aAll[1]}</button></h2>
+                    <h2 class="Tans">варіант відповіді<br><button class="Tinp-2">${aAll[2]}</button></h2>
+                    <h2 class="Tans">варіант відповіді<br><button class="Tinp-3">${aAll[3]}</button></h2>
+                    <h2 class="Tans">варіант відповіді<br><button class="Tinp-4">${aAll[4]}</button></h2>
+                </div>
+            </div>
+        `)
+    })
 })
