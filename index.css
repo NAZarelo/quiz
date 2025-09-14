@@ -2,7 +2,9 @@
 
 
 body {
-    font-family: Roboto;
+    font-family: "Roboto", sans-serif;
+    background: #0D73B6;
+    color: #F5F5F5;
 }
 
 .plus {
@@ -10,7 +12,7 @@ body {
     height: 5em;
 }
 
-.end {
+.end, .end-last{
     width: 100%;
     height: 5em;
 }
@@ -18,12 +20,34 @@ body {
 .exercise{
     text-align: center;
 }
+.Texercise{
+    text-align: center;
+}
 
 .answers {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.Tanswers {
     display: flex;
     text-align: center;
 }
 
 .ans {
     margin: 1em;
+}
+.Tans {
+    margin: 1em;
+}
+
+.ex {
+    width: 100%;
+    border: 3px solid #F5F5F5;
+    border-radius: 1rem;
+}
+.Tex {
+    width: 100%;
+    border: 3px solid #F5F5F5;
+    border-radius: 1rem;
 }
