@@ -90,6 +90,10 @@ buttonEnd.addEventListener('click', function () {
                 <h1 class="Tquestion">${qa.question}</h1>
                 <div class="Tanswers">${answersHtml}</div>
             </div>
+            <div class="Tresult">
+            ПРАВИЛЬНІ ВІДПОВІДІ:<br>
+            ${total_corrrect_answers} з ${total_answers}
+            </div>
             <button class="end-last">✓</button>
         `)
     })
