@@ -1,7 +1,7 @@
 // Шукаємо основні елементи з HTML
 let buttonPlus = document.querySelector('.plus')   // кнопка "додати питання"
-let buttonEnd = document.querySelector('.end')     // кнопка "завершити тест"
-let end_last = document.querySelector('.end-last') // блок, де створюються питання
+let buttonEnd = document.querySelector('.end')     // кнопка "переврка"
+let end_last = document.querySelector('.end-last') // завершити тест
 let exercise = document.querySelector('.exercise') // блок, де створюються питання
 let test = document.querySelector('.test')         // блок, де відображається готовий тест
 let total_answers = 1
@@ -33,6 +33,7 @@ buttonPlus.addEventListener('click', function () {
             </div>
         </div>
     `)
+    total_answers += 1
 })
 
 
@@ -90,13 +91,17 @@ buttonEnd.addEventListener('click', function () {
                 <h1 class="Tquestion">${qa.question}</h1>
                 <div class="Tanswers">${answersHtml}</div>
             </div>
+            
+        `)
+    })
+    test.insertAdjacentHTML("beforeend", `
             <div class="Tresult">
             ПРАВИЛЬНІ ВІДПОВІДІ:<br>
             ${total_corrrect_answers} з ${total_answers}
             </div>
             <button class="end-last">✓</button>
         `)
-    })
+        let Tresult = document.querySelector('.Tresult') 
 
     // Додаємо події для кнопок відповідей
     test.querySelectorAll('.Tbtn').forEach(btn => {
@@ -113,15 +118,17 @@ buttonEnd.addEventListener('click', function () {
             // Якщо вибрали правильну відповідь — зелений фон, інакше — червоний
             if (aIndex === questionAnswers[qIndex].correctIndex) {
                 this.style.background = "green"
-                total_answers += 1
                 total_corrrect_answers += 1
+                Tresult.innerHTML = `
+                    ПРАВИЛЬНІ ВІДПОВІДІ:<br>
+                    ${total_corrrect_answers} з ${total_answers}
+
+                `
             } else {
                 this.style.background = "red"
 
                 // + підсвічуємо правильний варіант, навіть якщо користувач помилився
                 allBtns[questionAnswers[qIndex].correctIndex].style.background = "green"
-
-                total_answers += 1
             }
         })
     })
