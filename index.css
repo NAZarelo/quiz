@@ -12,7 +12,7 @@ body {
     height: 5em;
 }
 
-.end, .end-last{
+.end, .end-last, .back{
     width: 100%;
     height: 5em;
 }

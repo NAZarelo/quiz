@@ -39,6 +39,7 @@ buttonPlus.addEventListener('click', function () {
 
 // --- Завершення тесту (створення готової версії) ---
 buttonEnd.addEventListener('click', function () {
+    test.style.display = 'block'
     questionAnswers = [] // очищаємо масив (щоб уникнути дублювання старих питань)
     let allExercises = document.querySelectorAll('.ex') // шукаємо всі питання на сторінці
 
@@ -100,8 +101,9 @@ buttonEnd.addEventListener('click', function () {
             ${total_corrrect_answers} з ${total_answers}
             </div>
             <button class="end-last">✓</button>
+            <button class="back"><</button>
         `)
-        let Tresult = document.querySelector('.Tresult') 
+    let Tresult = document.querySelector('.Tresult')
 
     // Додаємо події для кнопок відповідей
     test.querySelectorAll('.Tbtn').forEach(btn => {
@@ -131,5 +133,13 @@ buttonEnd.addEventListener('click', function () {
                 allBtns[questionAnswers[qIndex].correctIndex].style.background = "green"
             }
         })
+    })
+    let back = document.querySelector('.back') // назад
+
+    back.addEventListener('click', function () {
+        exercise.style.display = 'block'
+        buttonPlus.style.display = 'block'
+        buttonEnd.style.display = 'block'
+        test.style.display = 'none'
     })
 })
