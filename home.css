@@ -1,0 +1,10 @@
+body {
+    font-family: "Roboto", sans-serif;
+    background: #0D73B6;
+    color: #F5F5F5;
+}
+
+.new-project {
+    width: 100%;
+    height: 5em;
+}
