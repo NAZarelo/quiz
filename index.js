@@ -4,8 +4,12 @@ let buttonEnd = document.querySelector('.end')     // кнопка "перевр
 let end_last = document.querySelector('.end-last') // завершити тест
 let exercise = document.querySelector('.exercise') // блок, де створюються питання
 let test = document.querySelector('.test')         // блок, де відображається готовий тест
+
+
+let total_given_answers = 0
 let total_answers = 1
 let total_corrrect_answers = 0
+
 
 // Масив для збереження усіх питань з відповідями
 let questionAnswers = []
@@ -95,6 +99,48 @@ buttonEnd.addEventListener('click', function () {
             
         `)
     })
+
+
+    let timer = true
+
+
+    let create_name_inp = document.querySelector('.create-name-inp')
+    let create_time_inp = document.querySelector('.create-time-inp')
+
+
+    test.insertAdjacentHTML("beforebegin", `
+            <h1 class="test-name">${create_name_inp.value}</h1>
+            <h1 class="test-time">${create_time_inp.value}</h1>
+        `)
+
+    let test_time = document.querySelector('.test-time')
+
+
+
+    let time = parseInt(create_time_inp.value) * 60// робимо число
+    let s = setInterval(function () {
+        time = time - 1
+        test_time.innerHTML = time
+        if (total_given_answers == total_answers){
+        time = 0
+        }
+
+        
+
+        if (time <= 0) { // перевіряємо тут
+            clearInterval(s)
+            test_time.innerHTML = "ТЕСТУВАННЯ ЗАВЕРШЕНО!"
+            timer = false
+            alert('Ви дали ' + total_corrrect_answers + ' з ' + total_answers)
+            total_given_answers            
+        }
+    }, 1000)
+
+
+    
+
+
+
     test.insertAdjacentHTML("beforeend", `
             <div class="Tresult">
             ПРАВИЛЬНІ ВІДПОВІДІ:<br>
@@ -118,22 +164,27 @@ buttonEnd.addEventListener('click', function () {
             allBtns.forEach(b => b.disabled = true)
 
             // Якщо вибрали правильну відповідь — зелений фон, інакше — червоний
-            if (aIndex === questionAnswers[qIndex].correctIndex) {
-                this.style.background = "green"
-                total_corrrect_answers += 1
-                Tresult.innerHTML = `
+            if (timer == true) {
+                if (aIndex === questionAnswers[qIndex].correctIndex) {
+                    total_given_answers = +total_given_answers + 1
+                    this.style.background = "green"
+                    total_corrrect_answers += 1
+                    Tresult.innerHTML = `
                     ПРАВИЛЬНІ ВІДПОВІДІ:<br>
                     ${total_corrrect_answers} з ${total_answers}
 
-                `
-            } else {
-                this.style.background = "red"
+                    `
+                } else {
+                    total_given_answers = +total_given_answers + 1
+                    this.style.background = "red"
 
-                // + підсвічуємо правильний варіант, навіть якщо користувач помилився
-                allBtns[questionAnswers[qIndex].correctIndex].style.background = "green"
+                    // підсвічуємо правильний варіант, навіть якщо користувач помилився
+                    allBtns[questionAnswers[qIndex].correctIndex].style.background = "green"
+                }
             }
         })
     })
+    
     let back = document.querySelector('.back') // назад
 
     back.addEventListener('click', function () {
@@ -142,4 +193,9 @@ buttonEnd.addEventListener('click', function () {
         buttonEnd.style.display = 'block'
         test.style.display = 'none'
     })
+
+
+
+
+//    end_last.addEventListener('click', )
 })
