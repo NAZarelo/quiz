@@ -1,34 +1,25 @@
-// Шукаємо основні елементи з HTML
-let buttonPlus = document.querySelector('.plus')   // кнопка "додати питання"
-let buttonEnd = document.querySelector('.end')     // кнопка "переврка"
-let end_last = document.querySelector('.end-last') // завершити тест
-let exercise = document.querySelector('.exercise') // блок, де створюються питання
-let test = document.querySelector('.test')         // блок, де відображається готовий тест
+// ----------------------------
+// Основні елементи
+// ----------------------------
+let buttonPlus = document.querySelector('.plus');   
+let buttonEnd = document.querySelector('.end');     
+let exercise = document.querySelector('.exercise'); 
+let test = document.querySelector('.test');         
+let quizzes = document.querySelector('.quizzes');  
+let ready_quiz = document.querySelector('.ready-quiz');
 
+let questionAnswers = [];   
+let questionCount = 0;      
 
-let total_given_answers = 0
-let total_answers = 1
-let total_corrrect_answers = 0
-
-
-// Масив для збереження усіх питань з відповідями
-let questionAnswers = []
-
-// Лічильник для унікальних назв radio-кнопок (щоб у кожного питання були свої)
-let questionCount = 0;
-
-
-// --- Додавання нового питання ---
+// ----------------------------
+// Додавання нового питання
+// ----------------------------
 buttonPlus.addEventListener('click', function () {
-    questionCount++; // збільшуємо номер питання
-
-    // Додаємо HTML-код нового блоку питання
+    questionCount++;
     exercise.insertAdjacentHTML("beforeend", `
         <div class="ex">
             <h1>ПИТАННЯ<br><input class="question" type="text"></h1>
             <div class="answers">
-                <!-- кожен варіант має input[type=radio] з унікальним name -->
-                <!-- value="0..4" — номер відповіді, щоб знати яка правильна -->
                 <h2 class="ans">варіант відповіді<br><input name="correct${questionCount}" type="radio" value="0"><br><input class="inp-1" type="text"></h2>
                 <h2 class="ans">варіант відповіді<br><input name="correct${questionCount}" type="radio" value="1"><br><input class="inp-2" type="text"></h2>
                 <h2 class="ans">варіант відповіді<br><input name="correct${questionCount}" type="radio" value="2"><br><input class="inp-3" type="text"></h2>
@@ -36,166 +27,165 @@ buttonPlus.addEventListener('click', function () {
                 <h2 class="ans">варіант відповіді<br><input name="correct${questionCount}" type="radio" value="4"><br><input class="inp-5" type="text"></h2>
             </div>
         </div>
-    `)
-    total_answers += 1
-})
+    `);
+});
 
-
-// --- Завершення тесту (створення готової версії) ---
+// ----------------------------
+// Завершення створення тесту
+// ----------------------------
 buttonEnd.addEventListener('click', function () {
-    test.style.display = 'block'
-    questionAnswers = [] // очищаємо масив (щоб уникнути дублювання старих питань)
-    let allExercises = document.querySelectorAll('.ex') // шукаємо всі питання на сторінці
+    questionAnswers = [];
 
-    // Перебираємо усі блоки з питаннями
+    let allExercises = document.querySelectorAll('.ex');
     allExercises.forEach(ex => {
-        let q = ex.querySelector('.question').value // текст питання
-
-        // Масив з усіма варіантами відповідей
+        let q = ex.querySelector('.question').value;
         let answers = [
             ex.querySelector('.inp-1').value,
             ex.querySelector('.inp-2').value,
             ex.querySelector('.inp-3').value,
             ex.querySelector('.inp-4').value,
             ex.querySelector('.inp-5').value
-        ]
+        ];
+        let correctRadio = ex.querySelector('input[type="radio"]:checked');
+        let correctIndex = correctRadio ? parseInt(correctRadio.value) : -1;
 
-        // Знаходимо, який radio було обрано як правильний
-        let correctRadio = ex.querySelector('input[type="radio"]:checked')
-        // Якщо обрано — беремо його value (це номер правильного варіанта), інакше -1
-        let correctIndex = correctRadio ? parseInt(correctRadio.value) : -1
+        questionAnswers.push({ question: q, answers: answers, correctIndex: correctIndex });
+    });
 
-        // Додаємо об'єкт у масив
-        questionAnswers.push({
-            question: q,
-            answers: answers,
-            correctIndex: correctIndex
-        })
-    })
+    exercise.style.display = 'none';
+    buttonPlus.style.display = 'none';
+    buttonEnd.style.display = 'none';
 
-    // Ховаємо форму для створення тесту
-    exercise.style.display = 'none'
-    buttonPlus.style.display = 'none'
-    buttonEnd.style.display = 'none'
+    test.style.display = 'block';
+    test.innerHTML = "";
 
-    // Очищаємо блок для готового тесту
-    test.innerHTML = ""
+    let create_name_inp = document.querySelector('.create-name-inp').value;
+    let create_time_inp = parseInt(document.querySelector('.create-time-inp').value);
 
-    // Виводимо усі питання з варіантами
-    questionAnswers.forEach((qa, idx) => {
-        // Для кожної відповіді робимо кнопку з атрибутом data-index
+    test.insertAdjacentHTML("beforebegin", `
+        <h1 class="test-name">${create_name_inp}</h1>
+    `);
+
+    renderTest(questionAnswers, test, create_time_inp);
+
+    test.insertAdjacentHTML("beforeend", `
+        <a href="#"><button class="end-last">✓</button></a>
+        <button class="back"><</button>
+    `);
+
+    let end_last = test.querySelector('.end-last');
+    let back = test.querySelector('.back');
+
+    end_last.addEventListener('click', function() {
+        localStorage.setItem("readyQuizData", JSON.stringify(questionAnswers));
+        localStorage.setItem("readyQuizName", create_name_inp);
+        localStorage.setItem("readyQuizTime", create_time_inp);
+        window.location.href = "test.html";
+    });
+
+    back.addEventListener('click', function() {
+        exercise.style.display = 'block';
+        buttonPlus.style.display = 'block';
+        buttonEnd.style.display = 'block';
+        test.style.display = 'none';
+    });
+});
+
+// ----------------------------
+// Функція renderTest
+// ----------------------------
+function renderTest(questions, container, testTimeInMinutes = 0) {
+    container.innerHTML = "";
+    let total_answers = questions.length;
+    let total_correct_answers = 0;
+    let total_given_answers = 0;
+    let timer = true;
+
+    questions.forEach((qa, idx) => {
         let answersHtml = qa.answers.map((ans, i) => `
-            <h2 class="Tans">варіант відповіді<br>
+            <h2 class="Tans">
+                варіант відповіді<br>
                 <button class="Tbtn" data-q="${idx}" data-index="${i}">${ans}</button>
             </h2>
-        `).join("") // join об’єднує усі <h2> в один рядок
+        `).join("");
 
-        // Додаємо блок питання з усіма відповідями
-        test.insertAdjacentHTML("beforeend", `
+        container.insertAdjacentHTML("beforeend", `
             <div class="Tex">
                 <h1 class="Tquestion">${qa.question}</h1>
                 <div class="Tanswers">${answersHtml}</div>
             </div>
-            
-        `)
-    })
+        `);
+    });
 
-
-    let timer = true
-
-
-    let create_name_inp = document.querySelector('.create-name-inp')
-    let create_time_inp = document.querySelector('.create-time-inp')
-
-
-    test.insertAdjacentHTML("beforebegin", `
-            <h1 class="test-name">${create_name_inp.value}</h1>
-            <h1 class="test-time">${create_time_inp.value}</h1>
-        `)
-
-    let test_time = document.querySelector('.test-time')
-
-
-
-    let time = parseInt(create_time_inp.value) * 60// робимо число
-    let s = setInterval(function () {
-        time = time - 1
-        test_time.innerHTML = time
-        if (total_given_answers == total_answers){
-        time = 0
-        }
-
-        
-
-        if (time <= 0) { // перевіряємо тут
-            clearInterval(s)
-            test_time.innerHTML = "ТЕСТУВАННЯ ЗАВЕРШЕНО!"
-            timer = false
-            alert('Ви дали ' + total_corrrect_answers + ' з ' + total_answers)
-            total_given_answers            
-        }
-    }, 1000)
-
-
-    
-
-
-
-    test.insertAdjacentHTML("beforeend", `
-            <div class="Tresult">
-            ПРАВИЛЬНІ ВІДПОВІДІ:<br>
-            ${total_corrrect_answers} з ${total_answers}
-            </div>
-            <button class="end-last">✓</button>
-            <button class="back"><</button>
-        `)
-    let Tresult = document.querySelector('.Tresult')
-
-    // Додаємо події для кнопок відповідей
-    test.querySelectorAll('.Tbtn').forEach(btn => {
+    container.querySelectorAll(".Tbtn").forEach(btn => {
         btn.addEventListener('click', function () {
-            let qIndex = parseInt(this.dataset.q)     // номер питання
-            let aIndex = parseInt(this.dataset.index) // номер відповіді
+            let qIndex = parseInt(this.dataset.q);
+            let aIndex = parseInt(this.dataset.index);
+            let allBtns = this.closest('.Tex').querySelectorAll('.Tbtn');
 
-            // Знаходимо всі кнопки цього питання
-            let allBtns = this.closest('.Tex').querySelectorAll('.Tbtn')
+            allBtns.forEach(b => b.disabled = true);
 
-            // Вимикаємо всі кнопки (щоб не можна було тицяти ще раз)
-            allBtns.forEach(b => b.disabled = true)
-
-            // Якщо вибрали правильну відповідь — зелений фон, інакше — червоний
-            if (timer == true) {
-                if (aIndex === questionAnswers[qIndex].correctIndex) {
-                    total_given_answers = +total_given_answers + 1
-                    this.style.background = "green"
-                    total_corrrect_answers += 1
-                    Tresult.innerHTML = `
-                    ПРАВИЛЬНІ ВІДПОВІДІ:<br>
-                    ${total_corrrect_answers} з ${total_answers}
-
-                    `
+            if (timer) {
+                if (aIndex === questions[qIndex].correctIndex) {
+                    total_correct_answers++;
+                    this.style.background = "green";
                 } else {
-                    total_given_answers = +total_given_answers + 1
-                    this.style.background = "red"
+                    this.style.background = "red";
+                    allBtns[questions[qIndex].correctIndex].style.background = "green";
+                }
 
-                    // підсвічуємо правильний варіант, навіть якщо користувач помилився
-                    allBtns[questionAnswers[qIndex].correctIndex].style.background = "green"
+                total_given_answers++;
+
+                if (total_given_answers >= total_answers) {
+                    timer = false;
+                    alert(`Ви дали ${total_correct_answers} з ${total_answers}`);
                 }
             }
-        })
-    })
-    
-    let back = document.querySelector('.back') // назад
+        });
+    });
 
-    back.addEventListener('click', function () {
-        exercise.style.display = 'block'
-        buttonPlus.style.display = 'block'
-        buttonEnd.style.display = 'block'
-        test.style.display = 'none'
-    })
+    if (testTimeInMinutes > 0) {
+        let time = testTimeInMinutes * 60;
+        let timerDiv = document.createElement("h1");
+        container.insertAdjacentElement("beforebegin", timerDiv);
 
+        let interval = setInterval(() => {
+            time--;
+            timerDiv.innerText = `Час: ${time} с`;
+            if (time <= 0 || !timer) {
+                clearInterval(interval);
+                timer = false;
+                timerDiv.innerText = "ТЕСТУВАННЯ ЗАВЕРШЕНО!";
+                alert(`Ви дали ${total_correct_answers} з ${total_answers}`);
+            }
+        }, 1000);
+    }
+}
 
+// ----------------------------
+// Код для test.html (для відновлення тесту)
+// ----------------------------
+document.addEventListener("DOMContentLoaded", function () {
+    if (ready_quiz) {
+        let savedData = localStorage.getItem("readyQuizData");
+        let savedName = localStorage.getItem("readyQuizName");
+        let savedTime = localStorage.getItem("readyQuizTime");
 
+        if (savedData) {
+            let questions = JSON.parse(savedData);
 
-//    end_last.addEventListener('click', )
-})
+            let title = document.createElement("h1");
+            title.innerText = savedName || "Тест";
+            ready_quiz.insertAdjacentElement("beforebegin", title);
+
+            renderTest(questions, ready_quiz, parseInt(savedTime) || 0);
+
+            // (опційно) очищення localStorage
+            // localStorage.removeItem("readyQuizData");
+            // localStorage.removeItem("readyQuizName");
+            // localStorage.removeItem("readyQuizTime");
+        } else {
+            ready_quiz.innerHTML = "Тест ще не створений!";
+        }
+    }
+});

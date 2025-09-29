@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="index.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Готовий тест</title>
+</head>
+
+<body>
+    <h1>Готовий тест</h1>
+    <div class="ready-quiz"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let ready_quiz = document.querySelector('.ready-quiz');
+
+            // Беремо дані з localStorage
+            let savedData = localStorage.getItem("readyQuizData");
+            let savedName = localStorage.getItem("readyQuizName");
+            let savedTime = localStorage.getItem("readyQuizTime");
+
+            if (savedData) {
+                let questions = JSON.parse(savedData);
+
+                // Виводимо назву тесту
+                let title = document.createElement("h1");
+                title.innerText = savedName || "Тест";
+                ready_quiz.insertAdjacentElement("beforebegin", title);
+
+                // Генеруємо тест і таймер
+                renderTest(questions, ready_quiz, parseInt(savedTime) || 0);
+
+                // (опційно) очистимо localStorage після завантаження
+                // localStorage.removeItem("readyQuizData");
+                // localStorage.removeItem("readyQuizName");
+                // localStorage.removeItem("readyQuizTime");
+            } else {
+                ready_quiz.innerHTML = "Тест ще не створений!";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
