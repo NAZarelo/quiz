@@ -10,14 +10,17 @@ body {
     color: #F5F5F5;
 }
 
-.plus {
-    width: 100%;
-    height: 5em;
-}
 
-.end, .end-last, .back{
+
+.end, .end-last, .back, .plus{
     width: 100%;
-    height: 5em;
+    height: 5rem;
+    background-color: #0D73B6;
+    color: #F5F5F5;
+    border: 3px solid #F5F5F5;
+    font-size: 2em;
+    margin-top: 0.5rem;
+    border-radius: 1rem;
 }
 
 .exercise{
@@ -78,6 +81,7 @@ body {
     margin: 1em;
     color: #084872;
     text-align: center;
+    font-size: 0.5em;
 }
 
 .question {
