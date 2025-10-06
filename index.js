@@ -1,15 +1,15 @@
 // ----------------------------
 // Основні елементи
 // ----------------------------
-let buttonPlus = document.querySelector('.plus');   
-let buttonEnd = document.querySelector('.end');     
-let exercise = document.querySelector('.exercise'); 
-let test = document.querySelector('.test');         
-let quizzes = document.querySelector('.quizzes');  
+let buttonPlus = document.querySelector('.plus');
+let buttonEnd = document.querySelector('.end');
+let exercise = document.querySelector('.exercise');
+let test = document.querySelector('.test');
+let quizzes = document.querySelector('.quizzes');
 let ready_quiz = document.querySelector('.ready-quiz');
 
-let questionAnswers = [];   
-let questionCount = 0;      
+let questionAnswers = [];
+let questionCount = 0;
 
 // ----------------------------
 // Додавання нового питання
@@ -76,14 +76,14 @@ buttonEnd.addEventListener('click', function () {
     let end_last = test.querySelector('.end-last');
     let back = test.querySelector('.back');
 
-    end_last.addEventListener('click', function() {
+    end_last.addEventListener('click', function () {
         localStorage.setItem("readyQuizData", JSON.stringify(questionAnswers));
         localStorage.setItem("readyQuizName", create_name_inp);
         localStorage.setItem("readyQuizTime", create_time_inp);
         window.location.href = "test.html";
     });
 
-    back.addEventListener('click', function() {
+    back.addEventListener('click', function () {
         exercise.style.display = 'block';
         buttonPlus.style.display = 'block';
         buttonEnd.style.display = 'block';
@@ -139,6 +139,9 @@ function renderTest(questions, container, testTimeInMinutes = 0) {
                 if (total_given_answers >= total_answers) {
                     timer = false;
                     alert(`Ви дали ${total_correct_answers} з ${total_answers}`);
+                    container.insertAdjacentHTML("beforeend", `
+                       <h1>Ви дали ${total_correct_answers} правильні відповіді з ${total_answers}</h1>
+                    `);
                 }
             }
         });
@@ -157,6 +160,7 @@ function renderTest(questions, container, testTimeInMinutes = 0) {
                 timer = false;
                 timerDiv.innerText = "ТЕСТУВАННЯ ЗАВЕРШЕНО!";
                 alert(`Ви дали ${total_correct_answers} з ${total_answers}`);
+                head
             }
         }, 1000);
     }
