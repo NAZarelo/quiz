@@ -129,12 +129,14 @@ function renderTest(questions, container, testTimeInMinutes = 0) {
                 if (aIndex === questions[qIndex].correctIndex) {
                     total_correct_answers++;
                     this.style.background = "green";
+                    total_given_answers++;
                 } else {
                     this.style.background = "red";
                     allBtns[questions[qIndex].correctIndex].style.background = "green";
+                    total_given_answers++;
                 }
 
-                total_given_answers++;
+                
 
                 if (total_given_answers >= total_answers) {
                     timer = false;
