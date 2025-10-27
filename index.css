@@ -112,3 +112,14 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+.plusDiv:hover {
+    transform: rotateX(25deg);
+    transition: transform 0.5s ease;
+}
+
+
+.endDiv:hover {
+    transform: rotateX(25deg);
+    transition: transform 0.5s ease;
+}
