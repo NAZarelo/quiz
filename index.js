@@ -7,6 +7,7 @@ let exercise = document.querySelector('.exercise');
 let test = document.querySelector('.test');
 let quizzes = document.querySelector('.quizzes');
 let ready_quiz = document.querySelector('.ready-quiz');
+let animation = document.querySelector('.animation');
 
 let questionAnswers = [];
 let questionCount = 0;
@@ -55,6 +56,73 @@ buttonEnd.addEventListener('click', function () {
     exercise.style.display = 'none';
     buttonPlus.style.display = 'none';
     buttonEnd.style.display = 'none';
+
+
+
+
+
+    let s = Math.min(innerWidth, innerHeight);
+    c.width = s;
+    c.height = s;
+    let w = s / 2.3,
+        h = s / 13,
+        start = Date.now(),
+        fall = 900,
+        spring = 150,
+        jump = 2000,
+        jumpDelay = 2700,
+        delay = i => i * (600 - i * 50),
+        clamp = (v, t) => Math.min(1, Math.max(0, v) / t),
+        ctx = c.getContext("2d");
+
+    function draw() {
+        let time = Date.now() - start;
+        ctx.clearRect(0, 0, s, s);
+        ctx.fillStyle = "white";
+
+        [0, 1, 2, 3, 4].forEach(block => {
+
+            let t = clamp(time - delay(block), fall);
+            let y = s * (t * t * t * 1.5 - 1.65 - .1 * block);
+
+            for (let i = 0; i < 5; i++) {
+                t = clamp(time - fall - delay(i), spring) - .6;
+                y += (1 - t * t) * s * .09;
+            }
+
+            t = clamp(time - jumpDelay, jump);
+
+            t = Math.pow(2, -10 * t) * Math.sin((t - .4 / 4) * (2 * Math.PI) / .4) + 1;
+            let r = t * block * .075 * Math.PI;
+            let x = s * .6 - Math.cos(r) * s * .6;
+            y -= Math.sin(r) * s * .6 - s * .1 * block * t;
+
+            ctx.save();
+            ctx.translate(s / 2 + x, s / 2 + y);
+            ctx.rotate(r);
+            ctx.fillRect(-w / 2, -h / 2, w, h);
+            ctx.restore();
+        });
+
+        let y = s * 0.14;
+        [
+            [-w / 2 - h * 2, y, h, s * 0.25],
+            [w / 2 + h, y, h, s * 0.25],
+            [-w / 2 - h * 2, y + s * 0.2, w + h * 4, h]
+        ]
+            .forEach(r => ctx.fillRect(s / 2 + r[0], s / 2 + r[1], r[2], r[3]));
+
+        requestAnimationFrame(draw);
+    }
+
+    addEventListener('click', () => start = Date.now());
+    draw();
+    
+    setTimeout(function() {
+        animation.style.display = 'none';
+    }, 3000)
+
+    
 
     test.style.display = 'block';
     test.innerHTML = "";
@@ -136,7 +204,7 @@ function renderTest(questions, container, testTimeInMinutes = 0) {
                     total_given_answers++;
                 }
 
-                
+
 
                 if (total_given_answers >= total_answers) {
                     timer = false;

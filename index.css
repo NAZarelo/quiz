@@ -104,3 +104,11 @@ body {
     color: #084872;
     text-align: center;
 }
+
+
+
+
+.animation {
+    align-items: center;
+    justify-content: center;
+}
